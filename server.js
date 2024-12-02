@@ -18,15 +18,15 @@ app.use(express.json());
 const userRoutes = require('./routes/userRoutes');
 const employerRoutes = require('./routes/employerRoutes');
 const postRoutes = require('./routes/postRoutes');
-const connectRoutes = require('./routes/connectRoutes');
-const assessmentRoutes = require('./routes/assessmentRoutes');
+const connectionRoutes = require('./routes/connectionRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 // Mount routers
 app.use('/api/users', userRoutes);
 app.use('/api/employers', employerRoutes);
 app.use('/api/posts', postRoutes);
-app.use('/api/connect', connectRoutes);
-app.use('/api/assessments', assessmentRoutes);
+app.use('/api/connections', connectionRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Error handler middleware
 app.use(errorHandler);

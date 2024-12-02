@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const connectionSchema = mongoose.Schema({
-  requester: {
+const messageSchema = mongoose.Schema({
+  sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
@@ -11,15 +11,14 @@ const connectionSchema = mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  status: {
+  content: {
     type: String,
-    enum: ['pending', 'accepted', 'rejected'],
-    default: 'pending',
+    required: true,
   },
 }, {
   timestamps: true,
 });
 
-const Connection = mongoose.model('Connection', connectionSchema);
+const Message = mongoose.model('Message', messageSchema);
 
-module.exports = Connection;
+module.exports = Message;

@@ -22,4 +22,24 @@ const createJobPost = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createJobPost };
+// Get all job posts
+const getJobPosts = asyncHandler(async (req, res) => {
+  const jobPosts = await JobPost.find();
+  res.json(jobPosts);
+});
+
+// Apply for a job post
+const applyForJob = asyncHandler(async (req, res) => {
+  const { jobId } = req.params;
+  const job = await JobPost.findById(jobId);
+
+  if (!job) {
+    res.status(404);
+    throw new Error('Job not found');
+  }
+
+  // Here, you would add logic to associate the user application with the job post.
+  res.status(200).json({ message: `Application for job ${jobId} submitted successfully.` });
+});
+
+module.exports = { createJobPost, getJobPosts, applyForJob };

@@ -9,17 +9,11 @@ const jobPostSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  skills: {
-    type: [String],
-    required: true,
-  },
-  salaryRange: {
-    type: String,
-    required: true,
-  },
+  skills: [String],
+  salaryRange: String,
   employer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employer',
+    ref: 'User',
     required: true,
   },
 }, {

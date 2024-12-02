@@ -1,31 +1,32 @@
 const asyncHandler = require('express-async-handler');
-const Employer = require('../models/Employer');
+const User = require('../models/User');
+const generateToken = require('../utils/generateToken');
 
 // Register a new employer
 const registerEmployer = asyncHandler(async (req, res) => {
-  const { companyName, email, password, jobPreferences, companyLogo, companyDescription } = req.body;
+  const { name, email, password } = req.body;
 
-  const employerExists = await Employer.findOne({ email });
+  const userExists = await User.findOne({ email });
 
-  if (employerExists) {
+  if (userExists) {
     res.status(400);
     throw new Error('Employer already exists');
   }
 
-  const employer = await Employer.create({
-    companyName,
+  const employer = await User.create({
+    name,
     email,
     password,
-    jobPreferences,
-    companyLogo,
-    companyDescription,
+    isEmployer: true,
   });
 
   if (employer) {
     res.status(201).json({
       _id: employer._id,
-      companyName: employer.companyName,
+      name: employer.name,
       email: employer.email,
+      isEmployer: employer.isEmployer,
+      token: generateToken(employer._id),
     });
   } else {
     res.status(400);
