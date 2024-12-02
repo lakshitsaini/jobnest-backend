@@ -1,14 +1,18 @@
-const connectDB = require("./connection");
+const mongoose = require('mongoose');
 
-const setupDatabase = async () => {
+const connectDB = async () => {
   try {
-    // Connect to the database
-    await connectDB();
-  } 
-  catch (error) {
-    console.error("Error during setup:", error.message);
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
+    });
+
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
   }
 };
 
-// Call the function to set up data
-setupDatabase();
+module.exports = connectDB;

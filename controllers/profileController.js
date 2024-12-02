@@ -1,91 +1,40 @@
-const model = require("../model/model");
-const upload = require("../middleware/fileUploadMiddleware");
+const asyncHandler = require('express-async-handler');
+const User = require('../model/user');
 
-const profileController = {};
+// Get user profile
+const getUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
 
-//Get user profile
-
-profileController.getProfile = async (req, res) => {
-  try {
-    const userId = req.params.id;
-
-    //fetch user profile from the model
-
-    const user = await model.getProfileByUserId(userId);
-
-    console.log(user);
-
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.status(200).json({ profile: user });
-  } catch (error) {
-    console.error("Error fetching profile data", error);
-
-    res.status(500).json({ error: "Internal server error" });
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404);
+    throw new Error('User not found');
   }
-};
+});
 
-//update user profile
+// Update user profile
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
 
-profileController.updatedProfile = async (req, res) => {
-  console.log("file upload working");
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.password = req.body.password || user.password;
+    user.preferences = req.body.preferences || user.preferences;
+    user.companyLogo = req.body.companyLogo || user.companyLogo;
+    user.companyDescription = req.body.companyDescription || user.companyDescription;
+    user.resume = req.body.resume || user.resume;
+    user.coverLetter = req.body.coverLetter || user.coverLetter;
+    user.socialProfiles = req.body.socialProfiles || user.socialProfiles;
 
-  console.log(req.body);
+    const updatedUser = await user.save();
 
-  try {
-    const userId = req.params.id;
-
-    const updateData = req.body;
-
-    upload.fields([
-      { name: "profilePhoto", maxCount: 1 },
-
-      { name: "resume", maxCount: 1 },
-
-      { name: "coverLetter", maxCount: 1 },
-    ]);
-
-    //check if files are uploaded and include them in updatedata
-
-    if (req.files) {
-      if (req.files.profilePhoto) {
-        updateData.profilePhoto = `/uploads/photo/${req.files.profilePhoto[0].filename}`;
-      }
-
-      if (req.files.resume) {
-        updateData.resume = `/uploads/resume/${req.files.resume[0].filename}`;
-      }
-
-      if (req.files.coverLetter) {
-        updateData.coverLetter = `/uploads/coverletter/${req.files.coverLetter[0].filename}`;
-      }
-    }
-
-    //update user data using the model
-
-    const updatedProfile = await model.updateProfile(userId, updateData);
-
-    console.log(updatedProfile);
-
-    if (!updatedProfile) {
-      res.status(404).json({ error: "user not found" });
-      return;
-    }
-
-    res
-      .status(200)
-      .json({
-        message: "Profile Updated successfully",
-        profile: updatedProfile,
-      });
-  } catch (error) {
-    console.error("Error Updating Profile: ", error);
-
-    res.status(400).json({ error: "Invalid Request Body" });
+    res.json(updatedUser);
+  } else {
+    res.status(404);
+    throw new Error('User not found');
   }
-};
+});
 
-module.exports = profileController;
+module.exports = { getUserProfile, updateUserProfile };

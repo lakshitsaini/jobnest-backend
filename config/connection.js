@@ -1,21 +1,17 @@
-const mongoose = require("mongoose");
-
-// MongoDB URI
-
-const dbURI = "mongodb://localhost:27017/jobPortalDB"; // Change this URI if you're using a remote MongoDB service.
+const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(dbURI, {
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
     });
 
-    console.log("MongoDB connected successfully!");
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error.message);
-
-    process.exit(1); // Exit process if connection fails
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
   }
 };
 
