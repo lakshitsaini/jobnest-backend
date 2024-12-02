@@ -1,45 +1,84 @@
-const asyncHandler = require('express-async-handler');
-const JobPost = require('../models/JobPost');
+const model = require("../model/model"); // Import model functions
 
-// Create a new job post
-const createJobPost = asyncHandler(async (req, res) => {
-  const { title, description, skills, salaryRange } = req.body;
-  const employer = req.user._id;
+const jobController = {};
 
-  const jobPost = await JobPost.create({
-    title,
-    description,
-    skills,
-    salaryRange,
-    employer,
-  });
+// Controller function to create a job post
 
-  if (jobPost) {
-    res.status(201).json(jobPost);
-  } else {
-    res.status(400);
-    throw new Error('Invalid job post data');
+jobController.createJobPost = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const {
+      title,
+      description,
+      skillsRequired,
+      jobType,
+      companyCulture,
+      salaryRange,
+    } = req.body;
+
+    const jobPostDetails = {
+      title: title,
+
+      description: description,
+
+      skillsRequired: skillsRequired,
+
+      jobType: jobType,
+
+      companyCulture: companyCulture,
+
+      salaryRange: salaryRange,
+    };
+
+    if (req.user.role != "recruiter") {
+      res.status(403).json({ message: "Only recruiters can create job posts" });
+
+      return;
+    }
+
+    // Call the model method to create the job post
+
+    const newJobPost = await model.createJobPost(userId, jobPostDetails);
+
+    res
+      .status(201)
+      .json({ message: "Job post created successfully", jobPost: newJobPost });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
-});
+};
 
-// Get all job posts
-const getJobPosts = asyncHandler(async (req, res) => {
-  const jobPosts = await JobPost.find();
-  res.json(jobPosts);
-});
+// Controller function to apply for a job post
 
-// Apply for a job post
-const applyForJob = asyncHandler(async (req, res) => {
-  const { jobId } = req.params;
-  const job = await JobPost.findById(jobId);
+jobController.applyForJob = async (req, res) => {
+  try {
+    const { userId, jobPostId } = req.params;
 
-  if (!job) {
-    res.status(404);
-    throw new Error('Job not found');
+    // Call the model method to apply for a job
+
+    await model.applyForJob(userId, jobPostId);
+
+    res.status(200).json({ message: "Applied for the job successfully" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
+};
 
-  // Here, you would add logic to associate the user application with the job post.
-  res.status(200).json({ message: `Application for job ${jobId} submitted successfully.` });
-});
+// Controller function to find matching job posts for a job seeker
 
-module.exports = { createJobPost, getJobPosts, applyForJob };
+jobController.findMatchingJobPosts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Call the model method to find matching job posts
+
+    const matchingJobs = await model.findMatchingJobPosts(userId);
+
+    res.status(200).json({ matchingJobs });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+module.exports = jobController;

@@ -1,10 +1,29 @@
-const express = require('express');
-const { createJobPost, getJobPosts, applyForJob } = require('../controllers/postController');
-const router = express.Router();
-const { protect } = require('../middlewares/authMiddleware');
+const express = require("express");
 
-router.post('/create', protect, createJobPost);
-router.get('/', getJobPosts);
-router.post('/apply/:jobId', protect, applyForJob);
+const router = express.Router();
+
+const jobController = require("../service/jobController");
+
+const authMiddleware = require("../middleware/authMiddleware"); // Add your authentication middleware
+
+// Route to create a job post (only accessible by recruiters)
+
+router.post("/createJobPost/:id", authMiddleware, jobController.createJobPost);
+
+// Route to apply for a job (only accessible by job seekers)
+
+router.post(
+  "/applyForJob/:jobPostId/:id",
+  authMiddleware,
+  jobController.applyForJob
+);
+
+// Route to get all matching job posts for a job seeker
+
+router.get(
+  "/matchingJobPosts/:id",
+  authMiddleware,
+  jobController.findMatchingJobPosts
+);
 
 module.exports = router;
