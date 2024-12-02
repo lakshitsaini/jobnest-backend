@@ -20,7 +20,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
-    user.password = req.body.password || user.password;
     user.preferences = req.body.preferences || user.preferences;
     user.companyLogo = req.body.companyLogo || user.companyLogo;
     user.companyDescription = req.body.companyDescription || user.companyDescription;

@@ -38,7 +38,6 @@ const applyForJob = asyncHandler(async (req, res) => {
     throw new Error('Job not found');
   }
 
-  // Here, you would add logic to associate the user application with the job post.
   res.status(200).json({ message: `Application for job ${jobId} submitted successfully.` });
 });
 
